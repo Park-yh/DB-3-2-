@@ -1,0 +1,44 @@
+----------------------------------------------------------------
+------------------------- 사용자 생성 ------------------------ 
+----------------------------------------------------------------
+/* ########  ID : SYSTEM ######## */
+
+ALTER session set "_ORACLE_SCRIPT"=true;
+DROP USER book CASCADE; -- 기존 사용자 삭제(현재 접속되어 있으면 삭제 안 됨)
+	-- CASCADE option : 관련 스키마 개체들도 함께 삭제.  Default는 No Action
+CREATE USER book IDENTIFIED BY 1234  -- 사용자 ID : book, 비밀번호 : 1234
+    DEFAULT TABLESPACE USERS
+    TEMPORARY TABLESPACE TEMP;
+GRANT connect, resource, dba TO book; -- 권한 부여
+-- Hint) SQL Script 실행방법 : Ctrl + Enter는 한명령어, F5는 전체 실행, 블럭이 지정되면 두 방법은 동일
+
+
+----------------------------------------------------------------
+--------------------- 테이블 생성 및 변경 -------------------
+----------------------------------------------------------------
+
+-- 사용자 테이블 생성
+CREATE TABLE USERS (
+    USER_ID VARCHAR2(20) PRIMARY KEY, -- 학번 (Primary Key)
+    EMAIL VARCHAR2(100) UNIQUE NOT NULL, -- 이메일 (Unique)
+    NAME VARCHAR2(50) NOT NULL, -- 이름
+    PHONE_NUMBER VARCHAR2(15) -- 전화번호
+);
+
+-- 책 테이블 생성
+CREATE TABLE BOOK (
+    SERIAL_NUMBER VARCHAR2(20) PRIMARY KEY, -- 일련번호 (Primary Key)
+    PUBLISHER VARCHAR2(100) NOT NULL, -- 출판사
+    TITLE VARCHAR2(200) NOT NULL, -- 제목
+    AUTHOR VARCHAR2(100) NOT NULL -- 저자
+);
+
+-- 거래내역 테이블 생성
+CREATE TABLE TRANSACTION_RECORDS (
+    TRANSACTION_ID NUMBER PRIMARY KEY, -- 거래 번호 (Primary Key)
+    PRICE NUMBER(10, 2) NOT NULL, -- 가격
+    TRANSACTION_DATE DATE, -- 거래 날짜
+    USERS_ID VARCHAR2(20), -- 사용자 학번 (Foreign Key)
+    CONSTRAINT FK_TRANSACTION_USER FOREIGN KEY (USERS_ID) REFERENCES USERS(USER_ID) -- 사용자 테이블 참조
+);
+
